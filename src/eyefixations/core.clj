@@ -18,21 +18,22 @@
 
 (defn centerOfMass [points]
  (let [x-positions (map #(:x %) points)
-        y-positions (map #(:y %) points)]
-  {:x (average x-positions) :y (average y-positions)}))
+        y-positions (map #(:y %) points)
+        times (map #(:time %) points)]
+  {:x (average x-positions) :y (average y-positions) :time (average times)}))
 
 (defn tooMuchDispersion [points maxDispersion]
   (> (dispersionOf points) maxDispersion))
 
 (defn getRawFixationGroups [points maxDispersion]
   (let [initialReduceValue []]
-  (reduce (fn [output point] 
+  (reduce (fn [output point]
     (let [window (concat (last output) [point])]
            (if (tooMuchDispersion window maxDispersion)
              (conj output [point])
              (if (or (empty? output) (= 1 (count output)))
                [window]
-               (concat (butlast output) [window]))))) initialReduceValue points)))
+               (concat (drop-last output) [window]))))) initialReduceValue points)))
 
 (defn collapseFixationGroupsByCenterOfMass [fixationGroups]
  (map #(centerOfMass %) fixationGroups))
@@ -44,3 +45,28 @@
   (collapseFixationGroupsByCenterOfMass
    (filterTooShortFixationGroups
     (getRawFixationGroups pointsVector maxDispersion) minFixationGroupSize)))
+
+(defn differenceInsideTreshold [a b treshold]
+  (<= (abs (- a b)) treshold))
+
+(defn distanceBetween [p1 p2]
+  (sqrt (+ (expt (- (:x p1) (:x p2)) 2)
+          (expt (- (:y p1) (:y p2)) 2))))
+
+(defn calculateCostBetweenSampleAndActual [sampleFixation actualFixations durationTreshold penaltyForNotFoundingMatch]
+  (let [matchedFixations
+      (filter #(differenceInsideTreshold (:time sampleFixation) (:time %) durationTreshold) actualFixations)]
+    (if (empty? matchedFixations)
+      penaltyForNotFoundingMatch
+      (distanceBetween sampleFixation (centerOfMass matchedFixations)))))
+
+(defn costFunction [actualFixations sampleFixations durationTreshold penaltyForNotFoundingMatch]
+  (apply + (for [sampleFixation sampleFixations] (calculateCostBetweenSampleAndActual sampleFixation actualFixations durationTreshold penaltyForNotFoundingMatch))))
+
+
+(defn getTrainedFixations [rawEyeData sampleFixations penaltyForNotFoundingMatch]
+  (apply min-key :cost (for [durationTreshold (range 1 50 ) maxDispersion (range 1 10) minFixationGroupSize (range 1 10)]
+    (let [fixations (getFixations rawEyeData maxDispersion minFixationGroupSize)
+          cost (costFunction  fixations sampleFixations durationTreshold penaltyForNotFoundingMatch)]
+            {:cost cost :fixations fixations :durationTreshold durationTreshold
+             :maxDispersion maxDispersion :minFixationGroupSize minFixationGroupSize}))))

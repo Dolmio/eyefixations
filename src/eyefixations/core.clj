@@ -24,15 +24,15 @@
 (defn tooMuchDispersion [points maxDispersion]
   (> (dispersionOf points) maxDispersion))
 
-(defn getRawFixationGroups [pointsVector maxDispersion]
-  (let [points (into-array pointsVector) initialReduceValue []]
-  (areduce points idx ret initialReduceValue
-           (let [window (concat (last ret) [(nth points idx)])]
+(defn getRawFixationGroups [points maxDispersion]
+  (let [initialReduceValue []]
+  (reduce (fn [output point] 
+    (let [window (concat (last output) [point])]
            (if (tooMuchDispersion window maxDispersion)
-             (conj ret [(nth points idx)])
-             (if (or (empty? ret) (= 1 (count ret)))
+             (conj output [point])
+             (if (or (empty? output) (= 1 (count output)))
                [window]
-               (concat (butlast ret) [window])))))))
+               (concat (butlast output) [window]))))) initialReduceValue points)))
 
 (defn collapseFixationGroupsByCenterOfMass [fixationGroups]
  (map #(centerOfMass %) fixationGroups))
@@ -42,4 +42,5 @@
 
 (defn getFixations [pointsVector maxDispersion minFixationGroupSize]
   (collapseFixationGroupsByCenterOfMass
-   (filterTooShortFixationGroups (getRawFixationGroups pointsVector maxDispersion) minFixationGroupSize)))
+   (filterTooShortFixationGroups
+    (getRawFixationGroups pointsVector maxDispersion) minFixationGroupSize)))

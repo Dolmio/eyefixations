@@ -13,14 +13,12 @@
     (+ (- (apply max x-positions) (apply min x-positions))
        (- (apply max y-positions) (apply min y-positions)))))
 
-(defn average [coll]
-  (/ (reduce + coll) (count coll)))
+(defn mapOverMap [f m]
+  (into {} (for [[k v] m] [k (f v)])))
 
 (defn centerOfMass [points]
- (let [x-positions (map #(:x %) points)
-        y-positions (map #(:y %) points)
-        times (map #(:time %) points)]
-  {:x (average x-positions) :y (average y-positions) :time (average times)}))
+  "calculates averages for every key in point"
+  (mapOverMap #(/ % (count points)) (apply merge-with + points)))
 
 (defn tooMuchDispersion [points maxDispersion]
   (> (dispersionOf points) maxDispersion))

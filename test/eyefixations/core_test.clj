@@ -18,13 +18,6 @@
     )
    )
 
-  (deftest centerOfMassTest
-    (let [p1 {:x 0 :y 0 :time 0} p2 {:x 100 :y 50 :time 0}]
-    (is (= {:x 50 :y 25 :time 0} (centerOfMass [p1 p2]))))
-
-    (let [p1 {:x 0 :y 0 :time 0} p2 {:x 0 :y -100 :time 0}]
-    (is (= {:x 0 :y -50 :time 0} (centerOfMass [p1 p2])))))
-
   (deftest collapseFixationGroupsByCenterOfMassTest
     (let [g1 [{:x 0 :y 0 :time 0} {:x 100 :y 50 :time 0}] g2 [{:x 100 :y 100 :time 0} {:x 200 :y 200 :time 0}]]
       (is (= [{:x 50 :y 25 :time 0} {:x 150 :y 150 :time 0}] (collapseFixationGroupsByCenterOfMass [g1 g2])))))
@@ -46,9 +39,6 @@
     (is (= true (differenceInsideTreshold 10 5 6)))
     (is (= true (differenceInsideTreshold 10 20 10)))
     (is (= false (differenceInsideTreshold 10 8 1))))
-
-  (deftest distanceBetweenTest
-    (is (= 5 (distanceBetween {:x 0 :y 0} {:x 3 :y 4}))))
 
   (deftest calculateCostBetweenSampleAndActualTest
     (let [sampleFixation {:time 10 :x 0 :y 0} actualFixations [{:time 10 :x 3 :y 4}]

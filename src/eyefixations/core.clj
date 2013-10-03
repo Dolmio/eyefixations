@@ -1,5 +1,6 @@
 (ns eyefixations.core
-   (:use clojure.contrib.math))
+   (:use clojure.contrib.math)
+   (:use eyefixations.math))
 
 (defn dataPointsInMinDurationTreshold [fps minDurationTreshold]
   "Calculates the datapoints needed to cover the minimium duration of
@@ -12,13 +13,6 @@
         y-positions (map #(:y %) points)]
     (+ (- (apply max x-positions) (apply min x-positions))
        (- (apply max y-positions) (apply min y-positions)))))
-
-(defn mapOverMap [f m]
-  (into {} (for [[k v] m] [k (f v)])))
-
-(defn centerOfMass [points]
-  "calculates averages for every key in point"
-  (mapOverMap #(/ % (count points)) (apply merge-with + points)))
 
 (defn tooMuchDispersion [points maxDispersion]
   (> (dispersionOf points) maxDispersion))
@@ -46,10 +40,6 @@
 
 (defn differenceInsideTreshold [a b treshold]
   (<= (abs (- a b)) treshold))
-
-(defn distanceBetween [p1 p2]
-  (sqrt (+ (expt (- (:x p1) (:x p2)) 2)
-          (expt (- (:y p1) (:y p2)) 2))))
 
 (defn calculateCostBetweenSampleAndActual [sampleFixation actualFixations durationTreshold penaltyForNotFoundingMatch]
   (let [matchedFixations

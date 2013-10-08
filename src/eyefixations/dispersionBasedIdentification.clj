@@ -1,4 +1,4 @@
-(ns eyefixations.core
+(ns eyefixations.dispersionBasedIdentification
    (:use clojure.contrib.math)
    (:use eyefixations.math))
 

@@ -1,6 +1,6 @@
-(ns eyefixations.core-test
+(ns eyefixations.dispersionBasedIdentification-test
   (:require [clojure.test :refer :all])
-  (:use eyefixations.core))
+  (:use eyefixations.dispersionBasedIdentification))
 
 (deftest dataPointsInMinimiumDurationTreshold
     (is (=  5 (let [fps 30 minDurationTreshold 150]

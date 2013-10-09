@@ -27,3 +27,13 @@ Return fixations"
                            (getDistancesBetweenPoints pointsVector)
                             velocityTreshold)))
 
+(defn labeledPoints [pointsVector velocityTreshold]
+  "Returns pointVector's points labeled wheter their are
+  part of a fixation or not"
+  (map (fn[%] (merge
+              {:fixation (< (:distance %) velocityTreshold)}
+              (:p1 %)))
+        (getDistancesBetweenPoints pointsVector)))
+
+
+

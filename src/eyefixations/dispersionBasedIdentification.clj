@@ -1,6 +1,7 @@
 (ns eyefixations.dispersionBasedIdentification
    (:use clojure.contrib.math)
-   (:use eyefixations.math))
+   (:use eyefixations.math)
+  (:use eyefixations.dataParser))
 
 (defn dataPointsInMinDurationTreshold [fps minDurationTreshold]
   "Calculates the datapoints needed to cover the minimium duration of
@@ -22,7 +23,7 @@
   (reduce (fn [output point]
     (let [window (concat (last output) [point])]
            (if (tooMuchDispersion window maxDispersion)
-             (conj output [point])
+             (conj (vec output) [point])
              (if (or (empty? output) (= 1 (count output)))
                [window]
                (concat (drop-last output) [window]))))) initialReduceValue points)))
@@ -34,9 +35,16 @@
   (filter #(>= (count %) minFixationGroupSize) fixationGroups))
 
 (defn getFixations [pointsVector maxDispersion minFixationGroupSize]
-  (collapseFixationGroupsByCenterOfMass
-   (filterTooShortFixationGroups
-    (getRawFixationGroups pointsVector maxDispersion) minFixationGroupSize)))
+  (-> pointsVector
+      (getRawFixationGroups maxDispersion)
+      (filterTooShortFixationGroups minFixationGroupSize)
+      (collapseFixationGroupsByCenterOfMass)))
+
+(defn labeledPoints [pointsVector maxDispersion minFixationGroupSize]
+   (flatten (map (fn[group]
+                  (map #(merge % {:fixation (>= (count group) minFixationGroupSize)})
+                 group))
+            (getRawFixationGroups pointsVector maxDispersion))))
 
 (defn differenceInsideTreshold [a b treshold]
   (<= (abs (- a b)) treshold))

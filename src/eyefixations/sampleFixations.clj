@@ -1,5 +1,5 @@
 (ns eyefixations.sampleFixations
- (:use eyefixations.core)
+ (:use eyefixations.dataParser)
  (:use clojure.contrib.math))
 
 (defn framesInRange [rangeMap frameRate]

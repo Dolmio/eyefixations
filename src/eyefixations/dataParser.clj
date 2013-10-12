@@ -1,4 +1,4 @@
-(ns eyefixations.core
+(ns eyefixations.dataParser
   (:require [clojure.string :as cstr])
   (:import java.util.Date)
   (:import java.io.File)

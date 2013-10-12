@@ -2,7 +2,7 @@
   (:use quil.core
         [quil.helpers.seqs :only [seq->stream]])
   (:require [eyefixations.velocityBasedIdentification :as simpleVelBasedIdentification])
-  (:use eyefixations.core)
+  (:use eyefixations.dataParser)
   (:use eyefixations.sampleFixations))
 
 (defn draw []

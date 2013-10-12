@@ -2,8 +2,7 @@
   (:require [clojure.string :as cstr])
   (:import java.util.Date)
   (:import java.io.File)
-  (:use clojure-csv.core)
-  (:use eyefixations.velocityBasedIdentification))
+  (:use clojure-csv.core))
 
 (defn open-file [file-name]
   (let [file-data (try
@@ -32,17 +31,25 @@
 (defn parse-int [s]
    (Integer. (re-find  #"\d+" s )))
 
-(defn parseRawSampleData [filename & options]
-(let [raw_rows (fetch-csv-data filename)
+(defn parseData [filename wantedColumnMappings & options]
+  (let [raw_rows (fetch-csv-data filename)
       frameCount (first options)
-      rows (if frameCount (take (+ 1 frameCount) raw_rows) raw_rows)
-      colNames (first rows)
-      xIdx (.indexOf colNames "B POR X [px]")
-      yIdx (.indexOf colNames "B POR Y [px]")
-      timeIdx (.indexOf colNames "Frame")]
+      rows (if frameCount (take (inc frameCount) raw_rows) raw_rows)
+      colNames (first rows)]
 
-  (map (fn[%] {:x (parse-int (nth % xIdx))
-               :y (parse-int (nth % yIdx))
-               :time 1})(rest rows))))
+   (map
+    ( fn[row] (apply hash-map
+                     (flatten(map ( fn[k](list (get wantedColumnMappings k)
+                                               (parse-int (nth row (.indexOf colNames k)))))
+                (keys wantedColumnMappings)))))
+    (rest rows))))
+
+(defn parseRawSampleData [& options]
+  (let [columnMappings {"B POR X [px]" :x
+                        "B POR Y [px]" :y}
+        frameLimit (first options)]
+    (parseData "resources/sample1.txt" columnMappings frameLimit)))
+
+
 
 

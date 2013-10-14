@@ -32,7 +32,7 @@
     (let [p1 {:x 0 :y 0 :time 0} p2 {:x 120 :y 60 :time 0} p3 {:x 0 :y 0 :time 0} minGroupSize 4 maxDispersion 1000]
       (is (= [] (getFixations [p1 p2 p3] maxDispersion minGroupSize))))
     "no Fixation groups should be found because of small maxDispersion"
-    (let [p1 {:x 0 :y 0 :time 0} p2 {:x 120 :y 60 :time 0} p3 {:x 0 :y 0 :time 0} minGroupSize 2 maxDispersion 1]
+    (let [p1 {:x 0 :y 0 :time 0} p2 {:x 120 :y 60 :time 0} p3 {:x 1 :y 0 :time 0} minGroupSize 2 maxDispersion 1]
       (is (= [] (getFixations [p1 p2 p3] maxDispersion minGroupSize)))))
 
   (deftest differenceInsideTresholdTest

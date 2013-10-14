@@ -18,11 +18,14 @@
 (defn tooMuchDispersion [points maxDispersion]
   (> (dispersionOf points) maxDispersion))
 
+(defn notFailedMeasurement [point]
+  (not (and (= 0 (:x point)) (= 0 (:y point)))))
+
 (defn getRawFixationGroups [points maxDispersion]
   (let [initialReduceValue []]
   (reduce (fn [output point]
     (let [window (concat (last output) [point])]
-           (if (tooMuchDispersion window maxDispersion)
+           (if (tooMuchDispersion (filter notFailedMeasurement window) maxDispersion)
              (conj (vec output) [point])
              (if (or (empty? output) (= 1 (count output)))
                [window]

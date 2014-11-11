@@ -19,7 +19,7 @@
   (> (dispersionOf points) maxDispersion))
 
 (defn notFailedMeasurement [point]
-  (not (and (= 0 (:x point)) (= 0 (:y point)))))
+  (not (= 0 (:x point) (:y point)) ))
 
 (defn getRawFixationGroups [points maxDispersion]
   (let [initialReduceValue []]

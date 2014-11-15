@@ -19,12 +19,11 @@
 
 (defn optimizeVelocityBasedIdentification[]
   (let [
-        sampleSize 10000
-        rawSampleData (parseRawSampleData sampleSize)
+        data (get-datas "1" "01")
+        rawSampleData (:raw-data data)
         sampleFixations (sampleFixationFrames
-                            (parseRawFixationData)
-                            frame-rate
-                            sampleSize)]
+                          (:fixation-data data)
+                            frame-rate)]
 
     (apply min-key #(:difference %) (map (fn [treshold] {:difference (difference sampleFixations (simpleVelBasedIdentification/labeledPoints
                                        rawSampleData
@@ -33,12 +32,11 @@
 
 (defn optimizeDispersionBasedIdentification []
   (let [
-        sampleSize 2000
-        rawSampleData (parseRawSampleData sampleSize)
+        data (get-datas "1" "01")
+        rawSampleData (:raw-data data)
         sampleFixations (sampleFixationFrames
-                            (parseRawFixationData)
-                            frame-rate
-                            sampleSize)]
+                          (:fixation-data data)
+                          frame-rate)]
 
 
     (apply min-key #(:difference %) (for [treshold (range 10 60)
@@ -52,12 +50,7 @@
 
 
 
-(parseRawSampleData 50)
-(map (fn[%] {:fixation (:fixation %)}) (sampleFixationFrames (parseRawFixationData) 30 30))
 
-(map (fn[%] {:fixation (:fixation %)}) (simpleVelBasedIdentification/labeledPoints (parseRawSampleData 30)
-                    11))
-(optimizeVelocityBasedIdentification)
 
 (defn get-longest-fixation-from-sample [data]
   (->> data
@@ -96,11 +89,11 @@
 
        ))
 
-(defn sampleFixations [sample-size]
+(defn sampleFixations []
   (sampleFixationFrames
-    (parseRawFixationData)
+    (:fixation-data (get-datas "0" "01"))
     frame-rate
-    sample-size))
+    nil))
 
 (defn velocity-fixation-data [sample-size treshold]
   (simpleVelBasedIdentification/labeledPoints

@@ -25,9 +25,10 @@
         (take frameCount frames)
         frames)))
 
-(defn parseRawFixationData []
+(defn parseRawFixationData-old []
   (let [columnMappings {"Position X" :x
                         "Position Y" :y
                         "Fixation Start [ms]" :startTime
                         "Fixation End [ms]" :endTime}]
     (parseData "resources/sample1_fixations.txt" columnMappings)))
+

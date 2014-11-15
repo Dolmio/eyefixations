@@ -57,9 +57,70 @@
                      :velocityData (seq->stream velocityFixationData)
                      :dispersionData (seq->stream dispersionFixationData)})))
 
-(defsketch gen-art-24
-  :title "Eyefixation viz"
-  :setup setup
-  :draw draw
-  :size [1000 1000])
+(defn start-some []
+  (defsketch gen-art-24
+             :title "Eyefixation viz"
+             :setup setup
+             :draw draw
+             :size [1000 1000])
+  )
 
+(defn draw-image[file-name]
+  (fn []
+    (do
+      (fill 60 60 60)
+      (ellipse 100 100 30 30)
+      (image (state :img) 0 0)
+      (let [points (state :points)]
+        (doall
+          (map #(ellipse (:x %) (:y %) 5 5) points)
+          )
+        (save file-name)
+
+        )
+
+      )
+    )
+
+
+
+  )
+
+
+
+(defn setup-draw-image [news-id trial-id person-id data-type-to-draw ]
+  (fn []
+    (let [data (:raw-data (get-datas news-id trial-id person-id))
+          ]
+      (smooth)
+      (background 0)
+      (set-state! :img (load-image (get-image-path news-id trial-id))
+                  :points data)
+
+      )
+
+
+  ))
+
+
+
+(defn start-draw-image [news-id trial-id person-id]
+
+  (defsketch gen-art-24
+             :title "Eyefixation viz"
+             :setup (setup-draw-image news-id trial-id person-id :raw-data)
+             :draw (draw-image (str "output/" news-id "-" trial-id "-" person-id ".jpg"))
+             :size [1000 1000])
+  )
+
+
+(defn save-all-images-with-raw-data []
+
+  (for [news-id (map (partial format "%02d") (range 9 10))
+        trial-id (map str (range 7 8))
+        person-id (map (partial format "%02d") (range 3 17))]
+    (start-draw-image news-id trial-id person-id)
+
+    )
+
+  )
